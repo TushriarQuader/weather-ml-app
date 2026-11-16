@@ -1,0 +1,68 @@
+---
+- name: Production Server Config
+  hosts: localhost
+  user: ubuntu
+  become: yes
+
+  vars:
+    app_image: "tquade200/weather-ml-app:latest"
+    deployment_name: weather-ml-app
+    service_name: weather-app-service
+    app_port: 5000
+    replicas: 3
+
+  tasks:
+    # Docker (needed so Minikube has a driver)
+    - name: 1. Install Docker and conntrack
+      apt:
+        update_cache: yes
+        name:
+          - docker.io
+          # conntack is needed for minikube
+          - conntrack
+        state: present
+
+    - name: 2. Enable and start Docker service
+      service:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: 3. Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+    # (a) Install kubectl
+    - name: 4. Download and install kubectl
+      get_url:
+        url: https://dl.k8s.io/v1.32.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+    # (b) Install and start Minikube
+    - name: 5. Download Minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/v1.35.0/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        # chmod permissions
+        mode: '0755'
+
+    - name: 6. Start Minikube cluster
+      become: no
+      shell:
+        cmd: sg docker -c "minikube start --driver=docker"
+    # (c) Deploy the image from DockerHub to Kubernetes
+    - name: 7. Create deployment
+      become: no
+      shell:
+        cmd: kubectl create deployment {{ deployment_name }} --image={{ app_image }} --dry-run=client -o yaml | kubectl apply -f -
+    # (d) Create a Service for the application
+    - name: 8. Expose deployment as NodePort service
+      become: no
+      shell:
+        cmd: kubectl expose deployment {{ deployment_name }} --type=NodePort --port={{ app_port }} --name={{ service_name }} --dry-run=client -o yaml | kubectl apply -f -
+    # (e) Scale deployment for future rolling updates
+    - name: 9. Scale deployment
+      become: no
+      shell:
+        cmd: kubectl scale deployment {{ deployment_name }} --replicas={{ replicas }}
