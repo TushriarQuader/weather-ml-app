@@ -67,7 +67,7 @@ jobs:
 
       # Log in to Docker Hub using your securely stored GitHub secrets.
       - name: Log in to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ci-cd-pipeline'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.PATRICIA_DOCKERHUB_USERNAME }}
@@ -75,7 +75,7 @@ jobs:
 
       # Build and publish the Docker image after the tests succeed.
       - name: Push Docker image to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ci-cd-pipeline'
         run: |
           # Build the image using your Docker Hub repository name.
           docker build -t patricianwani/weather-ml-app:latest .
