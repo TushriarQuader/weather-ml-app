@@ -1,0 +1,45 @@
+
+# Display name of our GitHub Actions workflow.
+name: Continuous Integration
+
+# Automatically run when code is pushed to either branch.
+on:
+  push:
+    branches:
+      - main
+      - ci-cd-pipeline
+
+jobs:
+  build-and-test:
+    # Use a GitHub-hosted Ubuntu machine.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download the project's code onto the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Python for running our application tests.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Install the libraries needed by the application.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install Flask
+
+      # Check that the Flask homepage loads successfully.
+      - name: Run smoke tests
+        run: python -m unittest discover -s tests -p "smoke_test.py" -v
+
+      # Test the model and individual application functions.
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -p "unit_test.py" -v
+
+      # Test that the Flask application and ML model work together.
+      - name: Run integration tests
+        run: python -m unittest discover -s tests -p "integration_test.py" -v
