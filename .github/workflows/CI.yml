@@ -43,3 +43,24 @@ jobs:
       # Test that the Flask application and ML model work together.
       - name: Run integration tests
         run: python -m unittest discover -s tests -p "integration_test.py" -v
+
+      # Build a Docker image containing the Flask application.
+      - name: Build Docker image
+        run: docker build -t weather-ml-app:test .
+
+      # Start the container and check that the Flask homepage responds.
+      - name: Test Docker container
+        run: |
+          # Start the container in the background and map port 5000.
+          docker run -d --name weather-test -p 5000:5000 weather-ml-app:test
+
+          # Give the application time to start.
+          sleep 5
+
+          # Check the application's homepage.
+          curl --fail --retry 5 --retry-delay 2 --retry-connrefused http://localhost:5000/
+
+      # Remove the test container, even if an earlier step fails.
+      - name: Clean up Docker container
+        if: always()
+        run: docker rm -f weather-test || true
