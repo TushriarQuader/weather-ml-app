@@ -4,6 +4,9 @@ name: Continuous Deployment
 
 # Allow manual execution while we configure Kubernetes.
 on:
+  push:
+    branches:
+      - ci-cd-pipeline
   workflow_dispatch:
 
 jobs:
