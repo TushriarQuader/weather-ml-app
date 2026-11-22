@@ -1,0 +1,25 @@
+
+# Define a Kubernetes Service for the weather application.
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: weather-app-service
+
+spec:
+  # Expose the application through a port on the Kubernetes node.
+  type: NodePort
+
+  # Send traffic to Pods belonging to the weather application.
+  selector:
+    app: weather-ml-app
+
+  ports:
+    # The port exposed by the Kubernetes Service.
+    - port: 5000
+
+      # The port where the Flask application listens.
+      targetPort: 5000
+
+      # Protocol used for communication.
+      protocol: TCP

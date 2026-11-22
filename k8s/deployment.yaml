@@ -1,0 +1,57 @@
+
+# Define a Kubernetes Deployment for the weather application.
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: weather-ml-app
+
+spec:
+  # Run three copies of the application for availability.
+  replicas: 3
+
+  # Replace application containers gradually during updates.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  # Identify the Pods managed by this Deployment.
+  selector:
+    matchLabels:
+      app: weather-ml-app
+
+  template:
+    metadata:
+      labels:
+        app: weather-ml-app
+
+    spec:
+      containers:
+        - name: weather-ml-app
+
+          # Use the Docker image we successfully published.
+          image: patricianwani/weather-ml-app:latest
+
+          # Check Docker Hub for the image when a Pod starts.
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 5000
+
+          # Send traffic only when the application is responding.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Restart the container if the application stops responding.
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
