@@ -32,7 +32,7 @@ spec:
         - name: weather-ml-app
 
           # Use the Docker image we successfully published.
-          image: patricianwani/weather-ml-app:latest
+          image: tquade200/weather-ml-app:latest
 
           # Check Docker Hub for the image when a Pod starts.
           imagePullPolicy: Always
