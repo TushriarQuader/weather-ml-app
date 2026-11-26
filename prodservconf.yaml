@@ -5,7 +5,7 @@
   become: yes
 
   vars:
-    app_image: "patricianwani/weather-ml-app:latest"
+    app_image: "tquade200/weather-ml-app:latest"
     deployment_name: weather-ml-app
     service_name: weather-app-service
     app_port: 5000
