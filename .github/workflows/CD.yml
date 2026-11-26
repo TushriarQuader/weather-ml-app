@@ -45,7 +45,7 @@ jobs:
 
           # Check both Kubernetes manifests in strict mode.
           ./kubeconform -strict -summary k8s/deployment.yaml k8s/service.yaml
-    deploy-to-ec2:
+  deploy-to-ec2:
         needs: validate-kubernetes
         runs-on: ubuntu-latest
 
@@ -70,8 +70,8 @@ jobs:
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
 
-            kubectl rollout status deployment/weather-ml-app --timeout=180s
+                kubectl rollout status deployment/weather-ml-app --timeout=180s
 
-            kubectl get pods
-            kubectl get services
+                kubectl get pods
+                kubectl get services
          
