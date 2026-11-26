@@ -78,8 +78,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           # Build the image using your Docker Hub repository name.
-          docker build -t patricianwani/weather-ml-app:latest .
+          docker build \
+          -t patricianwani/weather-ml-app:${{ github.sha}} \
+          -t patricianwani/weather-ml-app:latest .
 
           # Upload the image to Docker Hub.
+          docker push patricianwani/weather-ml-app:${{ github.sha}}
           docker push patricianwani/weather-ml-app:latest
 
