@@ -93,9 +93,9 @@ jobs:
       - name: Verify Docker image exists
         run: |
           curl --fail --silent --show-error \
-            "https://hub.docker.com/v2/repositories/patricianwani/weather-ml-app/tags/${DEPLOY_SHA}" \
+            "https://hub.docker.com/v2/repositories/tquade200/weather-ml-app/tags/${DEPLOY_SHA}" \
             > /dev/null
-          echo "Image patricianwani/weather-ml-app:${DEPLOY_SHA} is available"
+          echo "Image tquade200/weather-ml-app:${DEPLOY_SHA} is available"
 
       - name: Deploy application to EC2
         uses: appleboy/ssh-action@v1.2.0
@@ -110,7 +110,7 @@ jobs:
           script: |
             set -eu
 
-            echo "Deploying patricianwani/weather-ml-app:${DEPLOY_SHA}"
+            echo "Deploying tquade200/weather-ml-app:${DEPLOY_SHA}"
 
             # Bootstrap the checkout on a fresh instance; later runs just pull.
             if [ ! -d /home/ubuntu/weather-ml-app/.git ]; then
@@ -128,7 +128,7 @@ jobs:
             kubectl apply -f k8s/service.yaml
 
             kubectl set image deployment/weather-ml-app \
-              weather-ml-app=patricianwani/weather-ml-app:${DEPLOY_SHA}
+              weather-ml-app=tquade200/weather-ml-app:${DEPLOY_SHA}
 
             kubectl rollout status \
               deployment/weather-ml-app --timeout=300s
