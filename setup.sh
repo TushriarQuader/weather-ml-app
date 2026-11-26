@@ -2,8 +2,15 @@
 set -euo pipefail
 
 sudo apt-get update
-sudo apt-get upgrade -y
-sudo apt-get install -y ansible
+sudo apt-get install -y ansible git
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-ansible-playbook -c local -i "localhost," "${SCRIPT_DIR}/prodservconf.yaml"
+if [ ! -d /home/ubuntu/weather-ml-app/.git ]; then
+  git clone https://github.com/TushriarQuader/weather-ml-app.git /home/ubuntu/weather-ml-app
+fi
+
+cd /home/ubuntu/weather-ml-app
+git fetch origin main
+git checkout main
+git pull --ff-only origin main
+
+ansible-playbook -c local -i "localhost," prodservconf.yaml
