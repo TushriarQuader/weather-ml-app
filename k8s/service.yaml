@@ -16,10 +16,8 @@ spec:
 
   ports:
     # The port exposed by the Kubernetes Service.
-    - port: 5000
-
-      # The port where the Flask application listens.
-      targetPort: 5000
-
-      # Protocol used for communication.
+    - name: http
       protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 30080
