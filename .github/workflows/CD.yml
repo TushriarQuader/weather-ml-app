@@ -45,5 +45,33 @@ jobs:
 
           # Check both Kubernetes manifests in strict mode.
           ./kubeconform -strict -summary k8s/deployment.yaml k8s/service.yaml
-    
+    deploy-to-ec2:
+        needs: validate-kubernetes
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Deploy application to EC2
+            uses: appleboy/ssh-action@v1.2.0
+            with:
+              host: ${{ secrets.EC2_HOST }}
+              username: ubuntu
+              key: ${{ secrets.EC2_SSH_KEY }}
+              fingerprint: ${{ secrets.EC2_HOST_FINGERPRINT }}
+
+              script: |
+                set -e
+
+                cd /home/ubuntu/weather-ml-app
+
+                git pull --ff-only origin main
+
+                ansible-playbook prodservconf.yaml
+
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
+
+            kubectl rollout status deployment/weather-ml-app --timeout=180s
+
+            kubectl get pods
+            kubectl get services
          
