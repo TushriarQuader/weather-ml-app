@@ -1,0 +1,48 @@
+
+# Name of the GitHub Actions deployment workflow.
+name: Continuous Deployment
+
+# Allow manual execution while we configure Kubernetes.
+on:
+  push:
+    branches:
+      - ci-cd-pipeline
+  workflow_dispatch:
+
+jobs:
+  validate-kubernetes:
+    # Use a GitHub-hosted Ubuntu runner.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download the repository files onto the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install kubectl for Kubernetes configuration validation.
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.32.0'
+
+      # Check that the Deployment and Service manifests are valid YAML.
+      - name: Validate Kubernetes manifests
+        run: |
+          # Validate YAML structure without connecting to a cluster.
+          python -m pip install pyyaml
+
+          # Parse both Kubernetes configuration files.
+          python -c "import yaml; [yaml.safe_load(open(f)) for f in ['k8s/deployment.yaml', 'k8s/service.yaml']]"
+      
+      # Validate Kubernetes resources against their official schemas.
+      - name: Validate Kubernetes schemas
+        run: |
+          # Download the Kubeconform Linux executable.
+          curl -fsSL -o kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz
+
+          # Extract the executable from the downloaded archive.
+          tar -xzf kubeconform.tar.gz kubeconform
+
+          # Check both Kubernetes manifests in strict mode.
+          ./kubeconform -strict -summary k8s/deployment.yaml k8s/service.yaml
+    

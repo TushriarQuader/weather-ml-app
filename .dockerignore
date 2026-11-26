@@ -1,0 +1,15 @@
+
+# Exclude the local Python virtual environment.
+.venv/
+
+# Exclude Python-generated cache files.
+__pycache__/
+*.pyc
+
+# Exclude Git metadata and GitHub configuration.
+.git/
+.github/
+
+# Exclude local environment files that may contain secrets.
+.env
+.env.*
