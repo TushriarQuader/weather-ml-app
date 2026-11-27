@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 
-weather_classes = ['clear', 'foggy', 'drizzly', 'cloudy', 'hazey', 'misty', 'rain', 'smokey', 'thunderstorm'] # swithing 'foggy' & 'cloudy' positions, resolves unit test error. However, is also possible the ML model is wwong in prediciton -RW
+weather_classes = ['clear', 'foggy', 'drizzly', 'cloudy', 'hazey', 'misty', 'rainy', 'smokey', 'thunderstorm'] # swithing 'foggy' & 'cloudy' positions, resolves unit test error. However, is also possible the ML model is wwong in prediciton -RW
 
 def load_model(model_path = 'model/model.pkl'):
 	return pickle.load(open(model_path, 'rb'))
